@@ -27,6 +27,18 @@
   --lead: #3a3150;      /* window leading */
   --fawn: #e2bf8f;      /* pug */
   --mask: #3b2e2a;
+  /* Section bands: one tint per room of the abbey */
+  --band-hero: #e4dff2;     /* twilight */
+  --band-premise: #efe9e2;  /* cloister stone */
+  --band-layers: #f3e4ea;   /* rose glass */
+  --band-decrees: #f5ecd6;  /* parchment */
+  --band-inst: #e1ecdd;     /* herb garden */
+  --band-island: #dbe6f4;   /* sea mist */
+  --band-pil: #f4e7cc;      /* pilgrim amber */
+  --band-mood: #e0e1f3;     /* dusk */
+  --band-tend: #f4e2de;     /* blush */
+  --band-road: #e1e9ee;     /* slate fog */
+  --band-crit: #ebe0f0;     /* mauve */
   --font-wordmark: "UnifrakturCook", "Cormorant Garamond", Georgia, serif;
   --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
   --font-body: "Alegreya Sans", "Gill Sans", "Segoe UI", system-ui, sans-serif;
@@ -37,6 +49,9 @@
     --candle: #e8bc62; --candle-soft: #5a4520; --seal: #e07c94; --sage: #9fc6a2;
     --glass-rose: #7d3f55; --glass-sky: #34477a; --glass-moss: #3d5e45; --glass-amber: #8a6a2c;
     --lead: #0c0a16; --fawn: #d4ad7a; --mask: #2a201d;
+    --band-hero: #1d1836; --band-premise: #211b29; --band-layers: #2a1a2c; --band-decrees: #2a221b;
+    --band-inst: #172620; --band-island: #132036; --band-pil: #2c2213; --band-mood: #1b1c3a;
+    --band-tend: #2d1b22; --band-road: #16222b; --band-crit: #241a33;
     color-scheme: dark;
   }
 }
@@ -45,6 +60,9 @@
   --candle: #e8bc62; --candle-soft: #5a4520; --seal: #e07c94; --sage: #9fc6a2;
   --glass-rose: #7d3f55; --glass-sky: #34477a; --glass-moss: #3d5e45; --glass-amber: #8a6a2c;
   --lead: #0c0a16; --fawn: #d4ad7a; --mask: #2a201d;
+    --band-hero: #1d1836; --band-premise: #211b29; --band-layers: #2a1a2c; --band-decrees: #2a221b;
+    --band-inst: #172620; --band-island: #132036; --band-pil: #2c2213; --band-mood: #1b1c3a;
+    --band-tend: #2d1b22; --band-road: #16222b; --band-crit: #241a33;
   color-scheme: dark;
 }
 
@@ -57,7 +75,46 @@ body {
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
-.nave { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 5.5rem; padding-block: 2.5rem 5rem; }
+.nave { --gap: 5.5rem; max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--gap); padding-block: 2.5rem 5rem; position: relative; z-index: 0; }
+
+/* ---------- Section bands ----------
+   Each section paints a full-width band behind itself. Bands reach past their
+   section into the neighbors and fade out along a tilted line, so adjacent
+   colors cross-fade on a slant. Boundary tilts alternate direction. */
+html, body { overflow-x: clip; }
+.nave > :is(header, section) {
+  position: relative;
+  --lead-top: 15vw; --lead-bottom: 15vw; /* clears the corner a tilted fade would leave opaque */
+  --blend: calc(100px + 7.5vw); --fade-top: 170px; --fade-bottom: 170px;
+}
+.nave > :is(header, section)::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  left: calc(50% - 50vw); width: 100vw;
+  top: calc(var(--gap) / -2 - var(--blend));
+  bottom: calc(var(--gap) / -2 - var(--blend));
+  background: var(--band);
+  -webkit-mask-image:
+    linear-gradient(calc(180deg + var(--tilt-top)), transparent 0, transparent var(--lead-top), #000 calc(var(--lead-top) + var(--fade-top)), #000 100%),
+    linear-gradient(calc(180deg + var(--tilt-bottom)), #000 0, #000 calc(100% - var(--lead-bottom) - var(--fade-bottom)), transparent calc(100% - var(--lead-bottom)), transparent 100%);
+          mask-image:
+    linear-gradient(calc(180deg + var(--tilt-top)), transparent 0, transparent var(--lead-top), #000 calc(var(--lead-top) + var(--fade-top)), #000 100%),
+    linear-gradient(calc(180deg + var(--tilt-bottom)), #000 0, #000 calc(100% - var(--lead-bottom) - var(--fade-bottom)), transparent calc(100% - var(--lead-bottom)), transparent 100%);
+  -webkit-mask-composite: source-in;
+          mask-composite: intersect;
+}
+/* The hero band runs up under the nav with no top fade */
+.nave > .hero { --band: var(--band-hero); --tilt-top: 0deg; --tilt-bottom: 7deg; --fade-top: 0px; --lead-top: 0px; }
+.nave > .hero::before { top: calc(-2.5rem - 4rem); }
+#premise      { --band: var(--band-premise); --tilt-top: 7deg;  --tilt-bottom: -8deg; }
+#how-it-works { --band: var(--band-layers);  --tilt-top: -8deg; --tilt-bottom: 6deg; }
+#decrees      { --band: var(--band-decrees); --tilt-top: 6deg;  --tilt-bottom: -7deg; }
+#institutions { --band: var(--band-inst);    --tilt-top: -7deg; --tilt-bottom: 8deg; }
+#island       { --band: var(--band-island);  --tilt-top: 8deg;  --tilt-bottom: -6deg; }
+#pilgrimages  { --band: var(--band-pil);     --tilt-top: -6deg; --tilt-bottom: 7deg; }
+#mood         { --band: var(--band-mood);    --tilt-top: 7deg;  --tilt-bottom: -7deg; }
+#tending      { --band: var(--band-tend);    --tilt-top: -7deg; --tilt-bottom: 6deg; }
+#roadmap      { --band: var(--band-road);    --tilt-top: 6deg;  --tilt-bottom: -8deg; }
+#critique     { --band: var(--band-crit);    --tilt-top: -8deg; --tilt-bottom: 4deg; }
 h1, h2, h3 { font-family: var(--font-display); font-weight: 600; line-height: 1.1; text-wrap: balance; margin: 0; }
 h2 { font-size: clamp(2rem, 4.5vw, 2.9rem); }
 h3 { font-size: 1.45rem; }
@@ -114,6 +171,24 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 @media (prefers-reduced-motion: reduce) { .dropdown, .menu > button::after { transition: none; } }
 @media (max-width: 420px) { .topnav .brand { display: none; } .topnav .menus { margin: 0 auto; } }
 
+/* ---------- Icons (Lucide) ---------- */
+.ic { width: 1.05em; height: 1.05em; flex: none; display: inline-block; vertical-align: -0.15em; stroke-width: 2; }
+.eyebrow { display: inline-flex; align-items: center; gap: .5em; }
+.eyebrow .ic { width: 1.35em; height: 1.35em; }
+.layer h3, .panel h3, .phase h3 { display: flex; align-items: center; gap: .45em; }
+.layer h3 .ic, .panel h3 .ic { color: var(--tone, var(--candle)); }
+.panel h3 .ic { color: var(--candle); }
+.phase h3 .ic { color: var(--candle); width: .95em; height: .95em; }
+.rule dt, .pane dt, .tend-list b, .questions .src, .inst .cat { display: inline-flex; align-items: center; gap: .45em; }
+.rule dt .ic, .tend-list b .ic { color: var(--seal); }
+.pane .threshold { display: inline-flex; align-items: center; gap: .35em; }
+.pill { display: inline-flex; align-items: center; justify-content: center; gap: .35em; }
+.presets button { display: inline-flex; align-items: center; gap: .4em; }
+.menu > button .ic { width: 1.1em; height: 1.1em; }
+.dropdown a { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .65rem; align-items: start; }
+.dropdown a > .ic { margin-top: .2em; color: var(--candle); width: 1.15em; height: 1.15em; }
+.dropdown a.active > .ic { color: var(--seal); }
+
 /* ---------- Hero ---------- */
 .hero { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 3rem; align-items: center; position: relative; }
 .hero-copy { display: flex; flex-direction: column; gap: 1.4rem; min-width: 0; }
@@ -126,7 +201,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .window-wrap { position: relative; display: flex; justify-content: center; min-width: 0; }
 .window-wrap svg { width: 100%; max-width: 380px; height: auto; }
 .fog { position: absolute; inset: auto 0 4% 0; height: 40%; pointer-events: none; overflow: hidden; }
-.fog span { position: absolute; width: 60%; height: 70%; border-radius: 50%; background: var(--bg); filter: blur(22px); opacity: .85; animation: drift 18s ease-in-out infinite alternate; }
+.fog span { position: absolute; width: 60%; height: 70%; border-radius: 50%; background: var(--band-hero); filter: blur(22px); opacity: .85; animation: drift 18s ease-in-out infinite alternate; }
 .fog span:nth-child(2) { left: 40%; top: 30%; animation-duration: 24s; animation-delay: -6s; }
 .fog span:nth-child(3) { left: 10%; top: 50%; animation-duration: 21s; animation-delay: -12s; }
 @keyframes drift { from { transform: translateX(-12%); } to { transform: translateX(14%); } }
@@ -283,6 +358,96 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .questions span { color: var(--muted); font-size: .97rem; }
 .questions .src { font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; color: var(--candle); }
 
+/* ---------- Mechanic visuals ---------- */
+.fineprint { font-size: .85rem; color: var(--muted); display: flex; align-items: center; gap: .4em; }
+.decree-demo .payout, .twin ~ *, .tend-econ .econ-chart { grid-column: 1 / -1; }
+.payout { display: flex; flex-direction: column; gap: 1.2rem; margin-top: 1rem; }
+.payout-head { display: flex; flex-direction: column; gap: .35rem; max-width: 64ch; }
+.payout-head h3, .mood-ctrl h3, .cycle-wrap h3, .econ-chart h3 { display: flex; align-items: center; gap: .45em; }
+.payout-head h3 .ic, .mood-ctrl h3 .ic, .cycle-wrap h3 .ic, .econ-chart h3 .ic { color: var(--candle); }
+.payout-head p { color: var(--muted); }
+.payout-row { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1.25fr) auto minmax(0,1fr) auto minmax(0,1fr); align-items: stretch; gap: .6rem; }
+.pay { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 1rem; display: flex; flex-direction: column; align-items: center; text-align: center; gap: .45rem; min-width: 0; }
+.pay-label { font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; color: var(--candle); display: inline-flex; align-items: center; gap: .4em; }
+.pay-visual { height: 76px; display: flex; align-items: center; justify-content: center; gap: .3rem; }
+.pay-visual.grow svg { width: 64px; height: 54px; }
+.pay-visual.grow .arrow { width: 20px; height: 20px; color: var(--muted); }
+.pug-mini { width: 74px; height: 74px; }
+.num-big { font-family: var(--font-display); font-size: 3.2rem; font-weight: 700; line-height: 1; color: var(--ink); }
+.pay b { font-size: 1.02rem; }
+.pay-note { font-size: .85rem; color: var(--muted); }
+.plus { align-self: center; font-family: var(--font-display); font-size: 1.8rem; color: var(--muted); }
+.roll { font: inherit; font-size: .85rem; margin-top: auto; padding: .3rem .8rem; border-radius: 999px; border: 1.5px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: .4em; }
+.roll:hover { background: var(--ink); color: var(--surface); }
+
+.mood-demo { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 1.5rem; align-items: center; margin-top: 1.25rem; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 1.25rem; }
+.scene { display: block; width: 100%; height: auto; }
+.scene .fog, .scene .rays, .scene .moss, .scene .plaque, .scene .flame, .scene .monk, .scene .pug { transition: opacity .5s ease, transform .5s ease; }
+.mood-demo .fog { opacity: 0; }
+.mood-demo .rays, .mood-demo .moss, .mood-demo .plaque { opacity: 0; }
+.mood-demo[data-mood="soon"] .fog { opacity: .45; }
+.mood-demo[data-mood="soon"] .moss { opacity: .9; }
+.mood-demo[data-mood="soon"] .monk { animation: pace 2.4s ease-in-out infinite alternate; }
+.mood-demo[data-mood="over"] .fog { opacity: .78; }
+.mood-demo[data-mood="over"] .moss { opacity: 1; }
+.mood-demo[data-mood="over"] .flame { opacity: 0; }
+.mood-demo[data-mood="over"] .monk { animation: wring .35s ease-in-out infinite alternate; transform-origin: 82px 182px; }
+.mood-demo[data-mood="over"] .pug { transform: translateY(6px); }
+.mood-demo[data-mood="streak"] .rays, .mood-demo[data-mood="streak"] .plaque { opacity: 1; }
+@keyframes pace { from { transform: translateX(-14px); } to { transform: translateX(22px); } }
+@keyframes wring { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+.mood-ctrl { display: flex; flex-direction: column; gap: .8rem; min-width: 0; }
+.seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .45rem; }
+.seg button { font: inherit; font-size: .92rem; font-weight: 500; padding: .5rem .7rem; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: .45em; }
+.seg button:hover { border-color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.scene-cap { min-height: 3.2em; color: var(--ink); }
+
+.cycle-wrap { display: flex; flex-direction: column; gap: .5rem; margin-top: 1.25rem; }
+.cycle { list-style: none; margin: .8rem 0 .4rem; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .5rem; }
+.cycle li { position: relative; display: flex; flex-direction: column; gap: .35rem; padding-top: 1.1rem; min-width: 0; }
+.cycle li::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 6px; border-radius: 3px; background: var(--st); }
+.cycle li[data-s="ok"] { --st: var(--sage); }
+.cycle li[data-s="soon"] { --st: var(--candle); }
+.cycle li[data-s="over"] { --st: var(--seal); }
+.cycle li[data-s="streak"] { --st: linear-gradient(90deg, var(--seal), var(--candle-soft) 30%, var(--sage)); }
+.cycle .when { font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--muted); }
+.cyc-b { width: 72px; height: 60px; }
+.cycle b { display: inline-flex; align-items: center; gap: .4em; }
+.cycle b .ic { color: var(--st); }
+.cycle li[data-s="ok"] b .ic { color: var(--sage); } .cycle li[data-s="soon"] b .ic { color: var(--candle); }
+.cycle li[data-s="over"] b .ic { color: var(--seal); } .cycle li[data-s="streak"] b .ic { color: var(--candle); }
+.cycle li > span:last-child { font-size: .9rem; color: var(--muted); }
+
+.econ-chart { margin: 1rem 0 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 1.25rem 1.4rem; display: flex; flex-direction: column; gap: .5rem; }
+.econ-chart figcaption { display: flex; flex-direction: column; gap: .3rem; margin-bottom: .6rem; }
+.econ-chart figcaption p { color: var(--muted); }
+.er { display: grid; grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; align-items: center; padding: .4rem 0; }
+.er-body .er { border-top: 1px solid var(--line); }
+.er-body .er:hover { background: var(--bg); }
+.eh { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--muted); display: inline-flex; align-items: center; gap: .4em; }
+.eh small { letter-spacing: 0; text-transform: none; font-weight: 400; }
+.el { font-size: .95rem; }
+.el small { display: block; font-size: .8rem; color: var(--muted); }
+.ec { display: flex; align-items: center; gap: .5rem; min-width: 0; }
+.ec .ebar { display: block; height: 10px; border-radius: 0 4px 4px 0; min-width: 2px; flex: none; max-width: calc(100% - 2.5rem); }
+.ec .ebar.k { background: var(--candle); }
+.ec .ebar.d { background: var(--seal); }
+.ec .zero { display: block; width: 2px; height: 14px; background: var(--muted); opacity: .6; flex: none; }
+.ev { font-size: .88rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .mood-demo .monk { animation: none !important; } .scene * { transition: none !important; } }
+@media (max-width: 860px) {
+  .payout-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .plus { display: none; }
+  .mood-demo { grid-template-columns: minmax(0, 1fr); }
+  .cycle { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1.2rem; }
+}
+@media (max-width: 520px) {
+  .er { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: .3rem .8rem; }
+  .er .el { grid-column: 1 / -1; }
+  .er-head > span:first-child { display: none; }
+}
+
 footer { text-align: center; color: var(--muted); font-family: var(--font-display); font-style: italic; font-size: 1.1rem; }
 
 @media (max-width: 860px) {
@@ -291,7 +456,7 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
   .window-wrap { order: -1; }
   .window-wrap svg { max-width: 260px; }
   .meter { position: static; }
-  .nave { gap: 4rem; }
+  .nave { --gap: 4rem; }
 }
 @media (max-width: 520px) {
   .contrast { grid-template-columns: 1fr; }
@@ -303,6 +468,58 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
 </style>
 </head>
 <body>
+
+<!-- Icons: Lucide v0.460.0 (ISC license), the default icon set for shadcn/ui -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-bed" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16" /><path d="M2 8h18a2 2 0 0 1 2 2v10" /><path d="M2 17h20" /><path d="M6 8v9" /></g></symbol>
+    <symbol id="i-book-open" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14" /><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" /></g></symbol>
+    <symbol id="i-brush" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.06 11.9 8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08" /><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z" /></g></symbol>
+    <symbol id="i-calendar-days" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /><path d="M8 14h.01" /><path d="M12 14h.01" /><path d="M16 14h.01" /><path d="M8 18h.01" /><path d="M12 18h.01" /><path d="M16 18h.01" /></g></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" /><circle cx="7" cy="17" r="2" /><path d="M9 17h6" /><circle cx="17" cy="17" r="2" /></g></symbol>
+    <symbol id="i-castle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 20v-9H2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2Z" /><path d="M18 11V4H6v7" /><path d="M15 22v-4a3 3 0 0 0-3-3a3 3 0 0 0-3 3v4" /><path d="M22 11V9" /><path d="M2 11V9" /><path d="M6 4V2" /><path d="M18 4V2" /><path d="M10 4V2" /><path d="M14 4V2" /></g></symbol>
+    <symbol id="i-church" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 9h4" /><path d="M12 7v5" /><path d="M14 22v-4a2 2 0 0 0-4 0v4" /><path d="M18 22V5.618a1 1 0 0 0-.553-.894l-4.553-2.277a2 2 0 0 0-1.788 0L6.553 4.724A1 1 0 0 0 6 5.618V22" /><path d="m18 7 3.447 1.724a1 1 0 0 1 .553.894V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9.618a1 1 0 0 1 .553-.894L6 7" /></g></symbol>
+    <symbol id="i-circle-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" /></g></symbol>
+    <symbol id="i-circle-help" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><path d="M12 17h.01" /></g></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></g></symbol>
+    <symbol id="i-cloud-fog" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" /><path d="M16 17H7" /><path d="M17 21H9" /></g></symbol>
+    <symbol id="i-cloud-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="M20 12h2" /><path d="m19.07 4.93-1.41 1.41" /><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128" /><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z" /></g></symbol>
+    <symbol id="i-coins" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6" /><path d="M18.09 10.37A6 6 0 1 1 10.34 18" /><path d="M7 6h1v4" /><path d="m16.71 13.88.7.71-2.82 2.82" /></g></symbol>
+    <symbol id="i-cookie" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5" /><path d="M8.5 8.5v.01" /><path d="M16 15.5v.01" /><path d="M12 12v.01" /><path d="M11 17v.01" /><path d="M7 14v.01" /></g></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z" /><path d="M5 21h14" /></g></symbol>
+    <symbol id="i-feather" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.67 19a2 2 0 0 0 1.416-.588l6.154-6.172a6 6 0 0 0-8.49-8.49L5.586 9.914A2 2 0 0 0 5 11.328V18a1 1 0 0 0 1 1z" /><path d="M16 8 2 22" /><path d="M17.5 15H9" /></g></symbol>
+    <symbol id="i-file-spreadsheet" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M8 13h2" /><path d="M14 13h2" /><path d="M8 17h2" /><path d="M14 17h2" /></g></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" /></g></symbol>
+    <symbol id="i-footprints" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-6 4.5-6C9.37 2 10 3.8 10 5.5c0 3.11-2 5.66-2 8.68V16a2 2 0 1 1-4 0Z" /><path d="M20 20v-2.38c0-2.12 1.03-3.12 1-5.62-.03-2.72-1.49-6-4.5-6C14.63 6 14 7.8 14 9.5c0 3.11 2 5.66 2 8.68V20a2 2 0 1 0 4 0Z" /><path d="M16 17h4" /><path d="M4 13h4" /></g></symbol>
+    <symbol id="i-gamepad-2" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="11" y2="11" /><line x1="8" x2="8" y1="9" y2="13" /><line x1="15" x2="15.01" y1="12" y2="12" /><line x1="18" x2="18.01" y1="10" y2="10" /><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" /></g></symbol>
+    <symbol id="i-hammer" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.373 8.373a1 1 0 1 1-3-3L12 9" /><path d="m18 15 4-4" /><path d="m21.5 11.5-1.914-1.914A2 2 0 0 1 19 8.172V7l-2.26-2.26a6 6 0 0 0-4.202-1.756L9 2.96l.92.82A6.18 6.18 0 0 1 12 8.4V10l2 2h1.172a2 2 0 0 1 1.414.586L18.5 14.5" /></g></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2" /><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" /><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8" /><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" /></g></symbol>
+    <symbol id="i-hand-heart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16" /><path d="m7 20 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9" /><path d="m2 15 6 6" /><path d="M19.5 8.5c.7-.7 1.5-1.6 1.5-2.7A2.73 2.73 0 0 0 16 4a2.78 2.78 0 0 0-5 1.8c0 1.2.8 2 1.5 2.8L16 12Z" /></g></symbol>
+    <symbol id="i-landmark" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="22" y2="22" /><line x1="6" x2="6" y1="18" y2="11" /><line x1="10" x2="10" y1="18" y2="11" /><line x1="14" x2="14" y1="18" y2="11" /><line x1="18" x2="18" y1="18" y2="11" /><polygon points="12 2 20 7 4 7" /></g></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" /><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" /><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" /></g></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h.01" /><path d="M3 18h.01" /><path d="M3 6h.01" /><path d="M8 12h13" /><path d="M8 18h13" /><path d="M8 6h13" /></g></symbol>
+    <symbol id="i-list-checks" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 17 2 2 4-4" /><path d="m3 7 2 2 4-4" /><path d="M13 6h8" /><path d="M13 12h8" /><path d="M13 18h8" /></g></symbol>
+    <symbol id="i-list-ordered" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12h11" /><path d="M10 18h11" /><path d="M10 6h11" /><path d="M4 10h2" /><path d="M4 6h1v4" /><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" /></g></symbol>
+    <symbol id="i-lock-open" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></g></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z" /><path d="M15 5.764v15" /><path d="M9 3.236v15" /></g></symbol>
+    <symbol id="i-message-circle-heart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /><path d="M15.8 9.2a2.5 2.5 0 0 0-3.5 0l-.3.4-.35-.3a2.42 2.42 0 1 0-3.2 3.6l3.6 3.5 3.6-3.5c1.2-1.2 1.1-2.7.2-3.7" /></g></symbol>
+    <symbol id="i-message-square-quote" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /><path d="M8 12a2 2 0 0 0 2-2V8H8" /><path d="M14 12a2 2 0 0 0 2-2V8h-2" /></g></symbol>
+    <symbol id="i-milestone" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 13v8" /><path d="M12 3v3" /><path d="M4 6a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h13a2 2 0 0 0 1.152-.365l3.424-2.317a1 1 0 0 0 0-1.635l-3.424-2.318A2 2 0 0 0 17 6z" /></g></symbol>
+    <symbol id="i-package" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" /><path d="M12 22V12" /><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7" /><path d="m7.5 4.27 9 5.15" /></g></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor" /><circle cx="17.5" cy="10.5" r=".5" fill="currentColor" /><circle cx="8.5" cy="7.5" r=".5" fill="currentColor" /><circle cx="6.5" cy="12.5" r=".5" fill="currentColor" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" /></g></symbol>
+    <symbol id="i-paw-print" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2" /><circle cx="18" cy="8" r="2" /><circle cx="20" cy="16" r="2" /><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z" /></g></symbol>
+    <symbol id="i-pen-line" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9" /><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z" /></g></symbol>
+    <symbol id="i-quote" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" /><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" /></g></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4" /><path d="M3 11v-1a4 4 0 0 1 4-4h14" /><path d="m7 22-4-4 4-4" /><path d="M21 13v1a4 4 0 0 1-4 4H3" /></g></symbol>
+    <symbol id="i-scroll-text" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12h-5" /><path d="M15 8h-5" /><path d="M19 17V5a2 2 0 0 0-2-2H4" /><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3" /></g></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" /><path d="M20 3v4" /><path d="M22 5h-4" /><path d="M4 17v2" /><path d="M5 18H3" /></g></symbol>
+    <symbol id="i-sprout" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10" /><path d="M10 20c5.5-2.5.8-6.4 3-10" /><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z" /><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z" /></g></symbol>
+    <symbol id="i-store" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" /><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" /><path d="M2 7h20" /><path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7" /></g></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" /><path d="m6.34 17.66-1.41 1.41" /><path d="m19.07 4.93-1.41 1.41" /></g></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></g></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></g></symbol>
+  </defs>
+</svg>
 
 <!-- Shared SVG symbols -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -325,6 +542,9 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
       <path d="M86 146 Q100 156 114 146" stroke="#120d0c" stroke-width="3" fill="none" stroke-linecap="round"/>
       <path d="M96 149 Q100 162 104 149 Z" fill="#d97c8c"/>
     </symbol>
+    <symbol id="b-shack" viewBox="0 0 120 100"><path d="M20 90 V52 L80 38 V90 Z" fill="var(--fawn)" stroke="var(--lead)" stroke-width="3"/><path d="M14 54 L86 36" stroke="var(--lead)" stroke-width="4"/><rect x="40" y="62" width="16" height="28" fill="var(--lead)"/></symbol>
+    <symbol id="b-kennel" viewBox="0 0 120 100"><path d="M22 90 V50 L60 22 L98 50 V90 Z" fill="var(--glass-rose)" stroke="var(--lead)" stroke-width="3"/><path d="M48 90 V66 Q60 54 72 66 V90 Z" fill="var(--lead)"/></symbol>
+    <symbol id="b-chapel" viewBox="0 0 120 100"><rect x="26" y="46" width="68" height="44" fill="var(--surface)" stroke="var(--lead)" stroke-width="3"/><path d="M22 48 L60 22 L98 48 Z" fill="var(--glass-sky)" stroke="var(--lead)" stroke-width="3"/><rect x="54" y="2" width="12" height="22" fill="var(--surface)" stroke="var(--lead)" stroke-width="3"/><circle cx="60" cy="40" r="7" fill="var(--glass-amber)" stroke="var(--lead)" stroke-width="2"/><path d="M50 90 V70 Q60 60 70 70 V90 Z" fill="var(--lead)"/></symbol>
     <symbol id="seal" viewBox="0 0 60 60">
       <path d="M30 3 C38 5 44 2 49 9 C55 14 58 21 56 30 C58 39 54 46 48 51 C42 57 36 56 30 57 C22 58 16 55 11 50 C5 44 3 38 4 30 C2 21 6 14 12 9 C17 4 23 4 30 3 Z" fill="var(--seal)"/>
       <circle cx="30" cy="30" r="17" fill="none" stroke="var(--surface)" stroke-width="1.5" opacity=".55"/>
@@ -339,28 +559,28 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
     <a class="brand" href="#top">The Abbey</a>
     <ul class="menus" id="navmenus">
       <li class="menu">
-        <button type="button" id="menu-game" aria-expanded="false" aria-controls="dd-game">The Game</button>
+        <button type="button" id="menu-game" aria-expanded="false" aria-controls="dd-game"><svg class="ic" aria-hidden="true"><use href="#i-scroll-text"/></svg>The Game</button>
         <ul class="dropdown" id="dd-game">
-          <li><a href="#premise">Premise<small>Cozy meets gothic</small></a></li>
-          <li><a href="#how-it-works">How it works<small>Decrees, Pilgrimages, Tending</small></a></li>
-          <li><a href="#decrees">A Decree up close<small>How a real task is shown</small></a></li>
-          <li><a href="#institutions">Institutions<small>Seven buildings, seven monks</small></a></li>
+          <li><a href="#premise"><svg class="ic" aria-hidden="true"><use href="#i-church"/></svg><span>Premise<small>Cozy meets gothic</small></span></a></li>
+          <li><a href="#how-it-works"><svg class="ic" aria-hidden="true"><use href="#i-layers"/></svg><span>How it works<small>Decrees, Pilgrimages, Tending</small></span></a></li>
+          <li><a href="#decrees"><svg class="ic" aria-hidden="true"><use href="#i-scroll-text"/></svg><span>A Decree up close<small>How a real task is shown</small></span></a></li>
+          <li><a href="#institutions"><svg class="ic" aria-hidden="true"><use href="#i-landmark"/></svg><span>Institutions<small>Seven buildings, seven monks</small></span></a></li>
         </ul>
       </li>
       <li class="menu">
-        <button type="button" id="menu-world" aria-expanded="false" aria-controls="dd-world">The World</button>
+        <button type="button" id="menu-world" aria-expanded="false" aria-controls="dd-world"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg>The World</button>
         <ul class="dropdown" id="dd-world">
-          <li><a href="#island">The island<small>Map and locked areas</small></a></li>
-          <li><a href="#pilgrimages">Pilgrimages<small>Three set pieces</small></a></li>
-          <li><a href="#mood">Climate and mood<small>Weather, fog and candles</small></a></li>
-          <li><a href="#tending">Tending and economy<small>Fidgets, Kibble, Devotion</small></a></li>
+          <li><a href="#island"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg><span>The island<small>Map and locked areas</small></span></a></li>
+          <li><a href="#pilgrimages"><svg class="ic" aria-hidden="true"><use href="#i-footprints"/></svg><span>Pilgrimages<small>Three set pieces</small></span></a></li>
+          <li><a href="#mood"><svg class="ic" aria-hidden="true"><use href="#i-cloud-sun"/></svg><span>Climate and mood<small>Weather, fog and candles</small></span></a></li>
+          <li><a href="#tending"><svg class="ic" aria-hidden="true"><use href="#i-hand-heart"/></svg><span>Tending and economy<small>Fidgets, Kibble, Devotion</small></span></a></li>
         </ul>
       </li>
       <li class="menu">
-        <button type="button" id="menu-plan" aria-expanded="false" aria-controls="dd-plan">The Plan</button>
+        <button type="button" id="menu-plan" aria-expanded="false" aria-controls="dd-plan"><svg class="ic" aria-hidden="true"><use href="#i-list-checks"/></svg>The Plan</button>
         <ul class="dropdown" id="dd-plan">
-          <li><a href="#roadmap">Roadmap<small>Eight phases</small></a></li>
-          <li><a href="#critique">For critique<small>Pacing tool and open questions</small></a></li>
+          <li><a href="#roadmap"><svg class="ic" aria-hidden="true"><use href="#i-milestone"/></svg><span>Roadmap<small>Eight phases</small></span></a></li>
+          <li><a href="#critique"><svg class="ic" aria-hidden="true"><use href="#i-message-square-quote"/></svg><span>For critique<small>Pacing tool and open questions</small></span></a></li>
         </ul>
       </li>
     </ul>
@@ -372,7 +592,7 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
   <!-- 1. Hero -->
   <header class="hero">
     <div class="hero-copy">
-      <span class="eyebrow">A cozy task game · plan preview</span>
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-paw-print"/></svg>A cozy task game · plan preview</span>
       <h1 class="wordmark"><small>A Pug Sanctuary</small>The Abbey of the Wrinkled Lord</h1>
       <p class="tagline">Your chores, as decreed by His Wrinkledness.</p>
       <p class="pitch">You are the sole caretaker of a misty island monastery run by lazy, snorting, deeply revered pugs. Your real tasks arrive as solemn Decrees. Finish them in real life and the sanctuary grows from a cramped cottage into a sprawling, absurd dog-empire.</p>
@@ -427,14 +647,14 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
   <!-- 2. Premise -->
   <section class="premise" id="premise" aria-labelledby="premise-h">
     <div class="prose">
-      <span class="eyebrow">The premise</span>
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-church"/></svg>The premise</span>
       <h2 id="premise-h">A serene sanctuary. Underneath, a cult of supreme laziness.</h2>
       <p>On the surface it looks like a postcard: stone cloisters, rolling hills, cute little dog houses, fog over cobblestones. Underneath, it's an empire of snorting and logistical chaos, run by robed monks who are entirely subordinate to fat little dogs.</p>
       <p>The game plays the absurdity completely straight. Pugs are medieval royalty. A monk treats an ear-scratch like a papal bull. Your tax return becomes "The Annual Reckoning of Coin."</p>
     </div>
     <div class="contrast">
       <div>
-        <span class="eyebrow">Cozy</span>
+        <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-bed"/></svg>Cozy</span>
         <ul>
           <li>Soft pastel palette</li>
           <li>Velvet cushions and naps</li>
@@ -443,7 +663,7 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
         </ul>
       </div>
       <div>
-        <span class="eyebrow">Gothic</span>
+        <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-castle"/></svg>Gothic</span>
         <ul>
           <li>Stained glass of pugs on clouds</li>
           <li>Chanting robed monks</li>
@@ -457,26 +677,26 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
   <!-- 3. Layers -->
   <section id="how-it-works" aria-labelledby="layers-h">
     <div class="section-head">
-      <span class="eyebrow">How it works</span>
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-layers"/></svg>How it works</span>
       <h2 id="layers-h">Three layers. Only one of them is about real life.</h2>
       <p class="lede">Real progress opens the door. Play makes going through it fun.</p>
     </div>
     <div class="layers">
       <article class="layer" style="--tone: var(--seal)">
         <span class="what">Real tasks</span>
-        <h3>Decrees</h3>
+        <h3><svg class="ic" aria-hidden="true"><use href="#i-scroll-text"/></svg>Decrees</h3>
         <p>Your actual to-dos (taxes, a mural, an oil change), presented as wax-sealed scrolls from the Wrinkled Lord.</p>
         <p class="gives">Grows buildings, brings new pugs, earns Kibble and <b>Devotion</b>.</p>
       </article>
       <article class="layer" style="--tone: var(--candle)">
         <span class="what">In-game quests</span>
-        <h3>Pilgrimages</h3>
+        <h3><svg class="ic" aria-hidden="true"><use href="#i-footprints"/></svg>Pilgrimages</h3>
         <p>2–5 minute set pieces that permanently change the island. Each one stays locked until your Devotion reaches its threshold.</p>
         <p class="gives">Opens new areas, changes the lighting and weather, grants abilities.</p>
       </article>
       <article class="layer" style="--tone: var(--sage)">
         <span class="what">The fidget</span>
-        <h3>Tending</h3>
+        <h3><svg class="ic" aria-hidden="true"><use href="#i-hand-heart"/></svg>Tending</h3>
         <p>Belly rubs, wrinkle wiping, candle lighting. Something pleasant to do with your thumbs next to the task list.</p>
         <p class="gives">A little Kibble, capped daily. <b>Never</b> any Devotion.</p>
       </article>
@@ -526,7 +746,7 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
         <span>The Chariot Stables</span><span>Effort S</span><span>Due Dec 10</span><span>Every 3 months</span>
       </div>
       <div>
-        <span class="eyebrow">Articles of the Decree</span>
+        <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-list-checks"/></svg>Articles of the Decree</span>
         <ul class="articles">
           <li><label for="art1"><input type="checkbox" id="art1" checked><span>Book an appointment</span></label></li>
           <li><label for="art2"><input type="checkbox" id="art2"><span>Drop off the car</span></label></li>
@@ -537,23 +757,64 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
     </div>
     <div>
       <div class="section-head">
-        <span class="eyebrow">A Decree up close</span>
+        <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-scroll-text"/></svg>A Decree up close</span>
         <h2 id="decree-h">Your words stay yours. The pomp is added on top.</h2>
       </div>
       <dl class="rules">
-        <div class="rule"><dt>Your title</dt><dd>Kept exactly as you wrote it. "Oil change" stays "Oil change."</dd></div>
-        <div class="rule"><dt>Flavor line</dt><dd>Generated from the institution's copy pool, along with the wax seal and the resident monk.</dd></div>
-        <div class="rule"><dt>Articles</dt><dd>Your steps. Each one grows the building a little and pays 5 Kibble.</dd></div>
-        <div class="rule"><dt>Holy Texts</dt><dd>Your links and resources, such as the IRS site for taxes.</dd></div>
-        <div class="rule"><dt>Recurring</dt><dd>As the due date nears, the building gets mossy and the monk paces. Renewing it hangs a streak plaque.</dd></div>
+        <div class="rule"><dt><svg class="ic" aria-hidden="true"><use href="#i-pen-line"/></svg>Your title</dt><dd>Kept exactly as you wrote it. "Oil change" stays "Oil change."</dd></div>
+        <div class="rule"><dt><svg class="ic" aria-hidden="true"><use href="#i-quote"/></svg>Flavor line</dt><dd>Generated from the institution's copy pool, along with the wax seal and the resident monk.</dd></div>
+        <div class="rule"><dt><svg class="ic" aria-hidden="true"><use href="#i-list-ordered"/></svg>Articles</dt><dd>Your steps. Each one grows the building a little and pays 5 Kibble.</dd></div>
+        <div class="rule"><dt><svg class="ic" aria-hidden="true"><use href="#i-book-open"/></svg>Holy Texts</dt><dd>Your links and resources, such as the IRS site for taxes.</dd></div>
+        <div class="rule"><dt><svg class="ic" aria-hidden="true"><use href="#i-repeat"/></svg>Recurring</dt><dd>As the due date nears, the building gets mossy and the monk paces. Renewing it hangs a streak plaque.</dd></div>
       </dl>
+    </div>
+    <div class="payout" aria-labelledby="payout-h">
+      <div class="payout-head">
+        <h3 id="payout-h"><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg>What finishing "Oil change" pays</h3>
+        <p>A small Decree with 3 Articles, done in real life. Everything below happens at once, in a short ceremony.</p>
+      </div>
+      <div class="payout-row">
+        <div class="pay">
+          <span class="pay-label"><svg class="ic" aria-hidden="true"><use href="#i-landmark"/></svg>Building</span>
+          <div class="pay-visual grow" aria-hidden="true">
+            <svg viewBox="0 0 120 100"><use href="#b-shack"/></svg>
+            <svg class="arrow" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></g></svg>
+            <svg viewBox="0 0 120 100"><use href="#b-kennel"/></svg>
+          </div>
+          <b>+1 stage</b>
+          <span class="pay-note">The Chariot Stables: shack to kennel</span>
+        </div>
+        <span class="plus" aria-hidden="true">+</span>
+        <div class="pay pay-pug">
+          <span class="pay-label"><svg class="ic" aria-hidden="true"><use href="#i-paw-print"/></svg>A new pug</span>
+          <div class="pay-visual" aria-hidden="true"><svg viewBox="0 0 200 200" class="pug-mini"><use href="#pug"/></svg></div>
+          <b id="pug-name" aria-live="polite">Sir Snorbert the Damp</b>
+          <span class="pay-note" id="pug-office">Keeper of the Lesser Cushion</span>
+          <button type="button" id="pug-roll" class="roll"><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg>Summon another</button>
+        </div>
+        <span class="plus" aria-hidden="true">+</span>
+        <div class="pay">
+          <span class="pay-label"><svg class="ic" aria-hidden="true"><use href="#i-coins"/></svg>Kibble</span>
+          <div class="pay-visual num-big tnum" aria-hidden="true">35</div>
+          <b class="tnum">3 × 5 + 20</b>
+          <span class="pay-note">Articles plus the Small payout. +25% on an on-time renewal.</span>
+        </div>
+        <span class="plus" aria-hidden="true">+</span>
+        <div class="pay">
+          <span class="pay-label"><svg class="ic" aria-hidden="true"><use href="#i-flame"/></svg>Devotion</span>
+          <div class="pay-visual num-big tnum" aria-hidden="true">2.5</div>
+          <b class="tnum">3 × 0.5 + 1</b>
+          <span class="pay-note">Half the way to the first Pilgrimage. +1 on an on-time renewal.</span>
+        </div>
+      </div>
+      <p class="fineprint">Pug names are examples. The real pools live in the theme config.</p>
     </div>
   </section>
 
   <!-- 5. Institutions -->
   <section id="institutions" aria-labelledby="inst-h">
     <div class="section-head">
-      <span class="eyebrow">Seven institutions</span>
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-landmark"/></svg>Seven institutions</span>
       <h2 id="inst-h">Every task category gets a building, and every building gets a monk.</h2>
       <p class="lede">Finishing a Decree raises its building one stage. A Decree with no steps goes straight to the top.</p>
     </div>
@@ -581,7 +842,7 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
   <!-- 6. Island map -->
   <section id="island" aria-labelledby="map-h">
     <div class="section-head">
-      <span class="eyebrow">The island</span>
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg>The island</span>
       <h2 id="map-h">You start in a cramped cottage. Lord Chonk is lying on the bridge.</h2>
       <p class="lede">Permanent misty twilight with drizzle. Tap the ground to walk. Expansion plots, bought with Kibble, extend the edges.</p>
     </div>
@@ -652,33 +913,33 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
   <!-- 7. Pilgrimages -->
   <section id="pilgrimages" aria-labelledby="pil-h">
     <div class="section-head">
-      <span class="eyebrow">Pilgrimages</span>
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-footprints"/></svg>Pilgrimages</span>
       <h2 id="pil-h">Three set pieces, each unlocked by real-world Devotion.</h2>
       <p class="lede">Play them in any order once they're open. Each one changes the island for good.</p>
     </div>
     <div class="pilgrims">
       <article class="pane" style="--tone: var(--glass-sky)">
-        <span class="threshold tnum">Devotion 5</span>
+        <span class="threshold tnum"><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg>Devotion 5</span>
         <h3>The Great Snore Synchronization</h3>
         <dl>
-          <div><dt>How it plays</dt><dd>Take the antique brass microphone from the belfry and collect snore samples from sleeping pugs, each with its own pitch. Then tune the resonance organ's baffles to keep the waveform under the "glass crack" line.</dd></div>
-          <div class="unlock"><dt>Unlocks</dt><dd>The Dormitory Catacombs: heated sleeping crypts and rare nocturnal pugs.</dd></div>
+          <div><dt><svg class="ic" aria-hidden="true"><use href="#i-gamepad-2"/></svg>How it plays</dt><dd>Take the antique brass microphone from the belfry and collect snore samples from sleeping pugs, each with its own pitch. Then tune the resonance organ's baffles to keep the waveform under the "glass crack" line.</dd></div>
+          <div class="unlock"><dt><svg class="ic" aria-hidden="true"><use href="#i-lock-open"/></svg>Unlocks</dt><dd>The Dormitory Catacombs: heated sleeping crypts and rare nocturnal pugs.</dd></div>
         </dl>
       </article>
       <article class="pane" style="--tone: var(--glass-amber)">
-        <span class="threshold tnum">Devotion 12</span>
+        <span class="threshold tnum"><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg>Devotion 12</span>
         <h3>The Sacred Treat Tribute</h3>
         <dl>
-          <div><dt>How it plays</dt><dd>Forage a gull-guarded parsnip, cliff honey and crunchy seaweed. At the tribute oven, hold a temperature band and a crunchiness band at once. Get it wrong and Lord Chonk sighs theatrically.</dd></div>
-          <div class="unlock"><dt>Unlocks</dt><dd>Lord Chonk waddles aside, the Orchard opens, and twilight turns to a golden autumn afternoon.</dd></div>
+          <div><dt><svg class="ic" aria-hidden="true"><use href="#i-gamepad-2"/></svg>How it plays</dt><dd>Forage a gull-guarded parsnip, cliff honey and crunchy seaweed. At the tribute oven, hold a temperature band and a crunchiness band at once. Get it wrong and Lord Chonk sighs theatrically.</dd></div>
+          <div class="unlock"><dt><svg class="ic" aria-hidden="true"><use href="#i-lock-open"/></svg>Unlocks</dt><dd>Lord Chonk waddles aside, the Orchard opens, and twilight turns to a golden autumn afternoon.</dd></div>
         </dl>
       </article>
       <article class="pane" style="--tone: var(--glass-moss)">
-        <span class="threshold tnum">Devotion 20</span>
+        <span class="threshold tnum"><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg>Devotion 20</span>
         <h3>The Tail-Curl Calibration</h3>
         <dl>
-          <div><dt>How it plays</dt><dd>The weather vane reads the pugs' tails. Herd stubborn pugs into alignment circles, one tile at a time. Some move only when bribed. One moves only backwards.</dd></div>
-          <div class="unlock"><dt>Unlocks</dt><dd>The drizzle stops. Hot springs bubble up and grant Warm Paws, Steam Hop and the Pug Cart.</dd></div>
+          <div><dt><svg class="ic" aria-hidden="true"><use href="#i-gamepad-2"/></svg>How it plays</dt><dd>The weather vane reads the pugs' tails. Herd stubborn pugs into alignment circles, one tile at a time. Some move only when bribed. One moves only backwards.</dd></div>
+          <div class="unlock"><dt><svg class="ic" aria-hidden="true"><use href="#i-lock-open"/></svg>Unlocks</dt><dd>The drizzle stops. Hot springs bubble up and grant Warm Paws, Steam Hop and the Pug Cart.</dd></div>
         </dl>
       </article>
     </div>
@@ -688,12 +949,12 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
   <!-- 8. Climate & mood -->
   <section id="mood" aria-labelledby="clim-h">
     <div class="section-head">
-      <span class="eyebrow">Climate and mood</span>
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-cloud-sun"/></svg>Climate and mood</span>
       <h2 id="clim-h">The island always shows how things stand, without ever scolding you.</h2>
     </div>
     <div class="twin">
       <div class="panel">
-        <h3>Climate, permanent</h3>
+        <h3><svg class="ic" aria-hidden="true"><use href="#i-cloud-sun"/></svg>Climate, permanent</h3>
         <p class="driver">Changed by finishing Pilgrimages.</p>
         <div class="sky-strip">
           <div class="sky twilight"><b>Misty twilight</b>Drizzle. The start.</div>
@@ -702,15 +963,65 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
         </div>
       </div>
       <div class="panel">
-        <h3>Mood, live</h3>
+        <h3><svg class="ic" aria-hidden="true"><use href="#i-cloud-fog"/></svg>Mood, live</h3>
         <p class="driver">Laid over the climate, driven by where your Decrees stand today.</p>
         <ul class="moods">
-          <li><span class="pill ok">On track</span><span>Candles lit, pugs sploot happily.</span></li>
-          <li><span class="pill soon">Due soon</span><span>A light fog rolls in.</span></li>
-          <li><span class="pill over">Overdue</span><span>A fog bank over that institution. Its monk wrings their hands and its pugs sulk.</span></li>
-          <li><span class="pill streak">Streak</span><span>Rays through the stained glass and a choir hum.</span></li>
+          <li><span class="pill ok"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg>On track</span><span>Candles lit, pugs sploot happily.</span></li>
+          <li><span class="pill soon"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Due soon</span><span>A light fog rolls in.</span></li>
+          <li><span class="pill over"><svg class="ic" aria-hidden="true"><use href="#i-cloud-fog"/></svg>Overdue</span><span>A fog bank over that institution. Its monk wrings their hands and its pugs sulk.</span></li>
+          <li><span class="pill streak"><svg class="ic" aria-hidden="true"><use href="#i-sun"/></svg>Streak</span><span>Rays through the stained glass and a choir hum.</span></li>
         </ul>
       </div>
+    </div>
+    <div class="mood-demo" data-mood="ok">
+      <div class="scene-wrap">
+        <svg class="scene" viewBox="0 0 400 230" role="img" aria-labelledby="scene-cap">
+          <defs>
+            <filter id="fogblur" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+            <linearGradient id="raygrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--candle-soft)" stop-opacity=".95"/><stop offset="1" stop-color="var(--candle-soft)" stop-opacity="0"/></linearGradient>
+          </defs>
+          <rect x="0" y="0" width="400" height="230" rx="14" fill="var(--glass-sky)" opacity=".5"/>
+          <g class="rays"><path d="M250 0 L300 0 L230 200 L170 200 Z" fill="url(#raygrad)"/><path d="M320 0 L350 0 L270 200 L240 200 Z" fill="url(#raygrad)"/></g>
+          <path d="M0 176 Q120 160 220 172 T400 166 V230 H0 Z" fill="var(--glass-moss)"/>
+          <use href="#b-chapel" x="140" y="76" width="130" height="108"/>
+          <g class="moss" fill="var(--sage)"><ellipse cx="172" cy="129" rx="9" ry="4"/><ellipse cx="236" cy="131" rx="11" ry="4"/><ellipse cx="205" cy="104" rx="7" ry="3"/><path d="M160 118 l8 6 m-8 0 l8 -6" stroke="var(--muted)" stroke-width="1.2"/></g>
+          <g class="plaque"><rect x="238" y="150" width="22" height="14" rx="2" fill="var(--candle)"/><text x="249" y="160" text-anchor="middle" font-size="8" font-weight="700" fill="var(--surface)">III</text></g>
+          <g class="candles">
+            <rect x="112" y="156" width="8" height="20" rx="1.5" fill="var(--surface)" stroke="var(--lead)"/>
+            <path class="flame candle-flame" d="M116 142 Q121 150 116 156 Q111 150 116 142 Z" fill="#f4b940"/>
+            <rect x="292" y="152" width="8" height="24" rx="1.5" fill="var(--surface)" stroke="var(--lead)"/>
+            <path class="flame candle-flame" d="M296 138 Q301 146 296 152 Q291 146 296 138 Z" fill="#f4b940" style="animation-delay:-1.2s"/>
+          </g>
+          <g class="monk"><path d="M70 182 L82 136 L94 182 Z" fill="var(--muted)"/><circle cx="82" cy="130" r="8" fill="var(--fawn)"/><path d="M74 128 Q82 118 90 128" fill="var(--muted)"/></g>
+          <g class="pug"><use href="#pug" x="318" y="146" width="44" height="44"/></g>
+          <g class="fog" filter="url(#fogblur)" fill="var(--surface)"><ellipse cx="200" cy="120" rx="150" ry="34"/><ellipse cx="130" cy="160" rx="110" ry="26"/><ellipse cx="280" cy="150" rx="120" ry="28"/></g>
+          <g class="bubble"><rect x="326" y="118" width="40" height="20" rx="10" fill="var(--surface)" stroke="var(--line)"/><text id="bubble-t" x="346" y="132" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ink)">sploot</text></g>
+        </svg>
+      </div>
+      <div class="mood-ctrl">
+        <h3><svg class="ic" aria-hidden="true"><use href="#i-cloud-fog"/></svg>Try the live mood</h3>
+        <p class="driver">The Chariot Stables, as the oil change comes due.</p>
+        <div class="seg" role="group" aria-label="Decree state">
+          <button type="button" data-m="ok" aria-pressed="true"><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg>On track</button>
+          <button type="button" data-m="soon" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Due soon</button>
+          <button type="button" data-m="over" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-cloud-fog"/></svg>Overdue</button>
+          <button type="button" data-m="streak" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-sun"/></svg>Streak</button>
+        </div>
+        <p class="scene-cap" id="scene-cap">Candles are lit. Brother Axle polishes a chariot. The pug sploots.</p>
+      </div>
+    </div>
+
+    <div class="cycle-wrap">
+      <h3><svg class="ic" aria-hidden="true"><use href="#i-repeat"/></svg>One cycle of a recurring Decree</h3>
+      <p class="driver">"Oil change", every 3 months. The building slowly shows its age, then recovers when you renew.</p>
+      <ol class="cycle">
+        <li data-s="ok"><span class="when">Day 0</span><svg class="cyc-b" viewBox="0 0 120 100" aria-hidden="true"><use href="#b-kennel"/></svg><b><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg>Renewed</b><span>Fresh and clean. Candles lit.</span></li>
+        <li data-s="ok"><span class="when">Weeks 1–10</span><svg class="cyc-b" viewBox="0 0 120 100" aria-hidden="true"><use href="#b-kennel"/></svg><b><svg class="ic" aria-hidden="true"><use href="#i-circle-check"/></svg>Quiet</b><span>Nothing to do. The pugs nap.</span></li>
+        <li data-s="soon"><span class="when">~2 weeks before due</span><svg class="cyc-b mossy" viewBox="0 0 120 100" aria-hidden="true"><use href="#b-kennel"/><g fill="var(--sage)"><ellipse cx="40" cy="70" rx="10" ry="4"/><ellipse cx="78" cy="58" rx="8" ry="3"/></g><path d="M30 52 l10 8 m-10 0 l10 -8" stroke="var(--muted)" stroke-width="2"/></svg><b><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Moss creeps in</b><span>Cobwebs on the eaves, light fog, the monk paces.</span></li>
+        <li data-s="over"><span class="when">Past due</span><svg class="cyc-b foggy" viewBox="0 0 120 100" aria-hidden="true"><use href="#b-kennel"/><g fill="var(--bg)" opacity=".75"><ellipse cx="60" cy="62" rx="58" ry="16"/><ellipse cx="40" cy="80" rx="40" ry="10"/></g></svg><b><svg class="ic" aria-hidden="true"><use href="#i-cloud-fog"/></svg>Fog bank</b><span>The monk wrings their hands. Pugs sulk. Nothing is lost.</span></li>
+        <li data-s="streak"><span class="when">Renewed</span><svg class="cyc-b" viewBox="0 0 120 100" aria-hidden="true"><use href="#b-kennel"/><rect x="74" y="72" width="18" height="12" rx="2" fill="var(--candle)"/></svg><b><svg class="ic" aria-hidden="true"><use href="#i-sun"/></svg>Thrice Renewed</b><span>Fog lifts. A streak plaque goes up. On time: +25% Kibble, +1 Devotion.</span></li>
+      </ol>
+      <p class="fineprint"><svg class="ic" aria-hidden="true"><use href="#i-repeat"/></svg>Then the next cycle starts. The "due soon" window is tunable in the theme config.</p>
     </div>
   </section>
 
@@ -718,23 +1029,23 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
   <section class="tend-econ" id="tending" aria-labelledby="tend-h">
     <div>
       <div class="section-head" style="margin-bottom:0">
-        <span class="eyebrow">Tending</span>
+        <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-hand-heart"/></svg>Tending</span>
         <h2 id="tend-h">Something to do with your thumbs.</h2>
       </div>
       <ul class="tend-list">
-        <li><b>Belly rub, ear scratch</b><span>Friendship hearts. A nearby monk gasps at the honor.</span></li>
-        <li><b>Wrinkle cleaning</b><span>A little wipe gesture on grubby folds.</span></li>
-        <li><b>Light candles</b><span>Shrine candles slowly burn out.</span></li>
-        <li><b>Sweep</b><span>Leaves, and the occasional suspicious puddle.</span></li>
-        <li><b>Feed treats</b><span>Bacon wafer, cheese relic, cloud biscuit.</span></li>
-        <li><b>Pug wants</b><span>A cushion, being carried, a lost squeaky relic.</span></li>
-        <li><b>Best friends</b><span>They follow you in a waddling procession.</span></li>
+        <li><b><svg class="ic" aria-hidden="true"><use href="#i-hand"/></svg>Belly rub, ear scratch</b><span>Friendship hearts. A nearby monk gasps at the honor.</span></li>
+        <li><b><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg>Wrinkle cleaning</b><span>A little wipe gesture on grubby folds.</span></li>
+        <li><b><svg class="ic" aria-hidden="true"><use href="#i-flame"/></svg>Light candles</b><span>Shrine candles slowly burn out.</span></li>
+        <li><b><svg class="ic" aria-hidden="true"><use href="#i-brush"/></svg>Sweep</b><span>Leaves, and the occasional suspicious puddle.</span></li>
+        <li><b><svg class="ic" aria-hidden="true"><use href="#i-cookie"/></svg>Feed treats</b><span>Bacon wafer, cheese relic, cloud biscuit.</span></li>
+        <li><b><svg class="ic" aria-hidden="true"><use href="#i-message-circle-heart"/></svg>Pug wants</b><span>A cushion, being carried, a lost squeaky relic.</span></li>
+        <li><b><svg class="ic" aria-hidden="true"><use href="#i-users"/></svg>Best friends</b><span>They follow you in a waddling procession.</span></li>
       </ul>
       <p class="note">1–2 Kibble per action, about 30 a day at most, and never any Devotion. Only real tasks move the world forward.</p>
     </div>
     <div>
       <div class="section-head" style="margin-bottom:1.2rem">
-        <span class="eyebrow">Economy</span>
+        <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-coins"/></svg>Economy</span>
         <h2>Kibble you spend. Devotion you keep.</h2>
       </div>
       <div class="table-wrap">
@@ -753,58 +1064,101 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
         <li>Pug statues</li><li>Stained-glass panels</li><li>Velvet cushions</li><li>Candle shrines</li><li>Topiary pugs</li><li>Treats</li><li>Expansion plots</li>
       </ul>
     </div>
+    <figure class="econ-chart">
+      <figcaption>
+        <h3><svg class="ic" aria-hidden="true"><use href="#i-coins"/></svg>A full day of tending earns less than one Medium Decree</h3>
+        <p>And it earns no Devotion at all. Only real tasks open Pilgrimages.</p>
+      </figcaption>
+      <div class="er er-head" aria-hidden="true">
+        <span></span>
+        <span class="eh"><svg class="ic" aria-hidden="true"><use href="#i-coins"/></svg>Kibble <small>scale 0–120</small></span>
+        <span class="eh"><svg class="ic" aria-hidden="true"><use href="#i-flame"/></svg>Devotion <small>scale 0–4</small></span>
+      </div>
+      <div class="er-body" aria-label="Kibble and Devotion earned per action">
+          <div class="er" title="Tending, a full day: 30 Kibble, 0 Devotion">
+            <span class="el">Tending, a full day<small>at the daily cap</small></span>
+            <span class="ec"><i class="ebar k" style="width:25.0%"></i><span class="ev tnum">30</span></span>
+            <span class="ec"><i class="zero"></i><span class="ev tnum">0</span></span>
+          </div>
+          <div class="er" title="One Article (step): 5 Kibble, 0.5 Devotion">
+            <span class="el">One Article (step)</span>
+            <span class="ec"><i class="ebar k" style="width:4.2%"></i><span class="ev tnum">5</span></span>
+            <span class="ec"><i class="ebar d" style="width:12.5%"></i><span class="ev tnum">0.5</span></span>
+          </div>
+          <div class="er" title="Small Decree done: 20 Kibble, 1 Devotion">
+            <span class="el">Small Decree done</span>
+            <span class="ec"><i class="ebar k" style="width:16.7%"></i><span class="ev tnum">20</span></span>
+            <span class="ec"><i class="ebar d" style="width:25.0%"></i><span class="ev tnum">1</span></span>
+          </div>
+          <div class="er" title="Medium Decree done: 50 Kibble, 2 Devotion">
+            <span class="el">Medium Decree done</span>
+            <span class="ec"><i class="ebar k" style="width:41.7%"></i><span class="ev tnum">50</span></span>
+            <span class="ec"><i class="ebar d" style="width:50.0%"></i><span class="ev tnum">2</span></span>
+          </div>
+          <div class="er" title="Large Decree done: 120 Kibble, 4 Devotion">
+            <span class="el">Large Decree done</span>
+            <span class="ec"><i class="ebar k" style="width:100.0%"></i><span class="ev tnum">120</span></span>
+            <span class="ec"><i class="ebar d" style="width:100.0%"></i><span class="ev tnum">4</span></span>
+          </div>
+          <div class="er" title="Pilgrimage completed: 100 Kibble, 0 Devotion">
+            <span class="el">Pilgrimage completed</span>
+            <span class="ec"><i class="ebar k" style="width:83.3%"></i><span class="ev tnum">100</span></span>
+            <span class="ec"><i class="zero"></i><span class="ev tnum">0</span></span>
+          </div>
+      </div>
+    </figure>
   </section>
 
   <!-- 11. Roadmap -->
   <section id="roadmap" aria-labelledby="road-h">
     <div class="section-head">
-      <span class="eyebrow">Roadmap</span>
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-milestone"/></svg>Roadmap</span>
       <h2 id="road-h">Eight phases. Each one ships something usable.</h2>
       <p class="lede">The task manager comes first and the game is layered on after. Data stays on the device until the last phase.</p>
     </div>
     <ol class="roadmap">
-      <li class="phase"><span class="n">1</span><h3>Decree core</h3><p>Task list, editor, recurrence, CSV import, IndexedDB.</p><p class="done">Done when your real tasks survive a reload and the copy makes you smile.</p></li>
-      <li class="phase"><span class="n">2</span><h3>The island shell</h3><p>SVG map, camera, tap-to-walk, a lot per Decree with growing buildings.</p><p class="done">Done when every Decree has a building you can walk to.</p></li>
-      <li class="phase"><span class="n">3</span><h3>Ceremony, pugs, mood</h3><p>Completion ceremony, pug arrivals, monks, fog and candles.</p><p class="done">Done when finishing a task feels like a coronation.</p></li>
-      <li class="phase"><span class="n">4</span><h3>Tending</h3><p>Context actions, pug wants, friendship, the daily cap.</p><p class="done">Done when 2–5 minutes of fidgeting feels good.</p></li>
-      <li class="phase"><span class="n">5</span><h3>Pilgrimages</h3><p>Thresholds, the catacombs layer, climate system, all three set pieces.</p><p class="done">Done when each one visibly changes the island for good.</p></li>
-      <li class="phase"><span class="n">6</span><h3>Shop and decor</h3><p>Spend Kibble, place decor on a grid, buy expansion plots.</p><p class="done">Done when the sanctuary feels like your own absurd empire.</p></li>
-      <li class="phase"><span class="n">7</span><h3>Art and audio</h3><p>Final pastel-gothic art, optional sound and haptics, accessibility, PWA.</p><p class="done">Done when it looks and sounds finished.</p></li>
-      <li class="phase"><span class="n">8</span><h3>Sync</h3><p>Magic-link sign-in and a small Supabase backend; local stays the offline cache.</p><p class="done">Done when a task finished on the phone shows up on desktop.</p></li>
+      <li class="phase"><span class="n">1</span><h3><svg class="ic" aria-hidden="true"><use href="#i-scroll-text"/></svg>Decree core</h3><p>Task list, editor, recurrence, CSV import, IndexedDB.</p><p class="done">Done when your real tasks survive a reload and the copy makes you smile.</p></li>
+      <li class="phase"><span class="n">2</span><h3><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg>The island shell</h3><p>SVG map, camera, tap-to-walk, a lot per Decree with growing buildings.</p><p class="done">Done when every Decree has a building you can walk to.</p></li>
+      <li class="phase"><span class="n">3</span><h3><svg class="ic" aria-hidden="true"><use href="#i-crown"/></svg>Ceremony, pugs, mood</h3><p>Completion ceremony, pug arrivals, monks, fog and candles.</p><p class="done">Done when finishing a task feels like a coronation.</p></li>
+      <li class="phase"><span class="n">4</span><h3><svg class="ic" aria-hidden="true"><use href="#i-hand-heart"/></svg>Tending</h3><p>Context actions, pug wants, friendship, the daily cap.</p><p class="done">Done when 2–5 minutes of fidgeting feels good.</p></li>
+      <li class="phase"><span class="n">5</span><h3><svg class="ic" aria-hidden="true"><use href="#i-footprints"/></svg>Pilgrimages</h3><p>Thresholds, the catacombs layer, climate system, all three set pieces.</p><p class="done">Done when each one visibly changes the island for good.</p></li>
+      <li class="phase"><span class="n">6</span><h3><svg class="ic" aria-hidden="true"><use href="#i-store"/></svg>Shop and decor</h3><p>Spend Kibble, place decor on a grid, buy expansion plots.</p><p class="done">Done when the sanctuary feels like your own absurd empire.</p></li>
+      <li class="phase"><span class="n">7</span><h3><svg class="ic" aria-hidden="true"><use href="#i-palette"/></svg>Art and audio</h3><p>Final pastel-gothic art, optional sound and haptics, accessibility, PWA.</p><p class="done">Done when it looks and sounds finished.</p></li>
+      <li class="phase"><span class="n">8</span><h3><svg class="ic" aria-hidden="true"><use href="#i-repeat"/></svg>Sync</h3><p>Magic-link sign-in and a small Supabase backend; local stays the offline cache.</p><p class="done">Done when a task finished on the phone shows up on desktop.</p></li>
     </ol>
   </section>
 
   <!-- 12. Critique -->
   <section class="critique" id="critique" aria-labelledby="crit-h">
     <div class="section-head" style="margin-bottom:0">
-      <span class="eyebrow">For critique</span>
+      <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-message-square-quote"/></svg>For critique</span>
       <h2 id="crit-h">Try the pacing with the real task list.</h2>
       <p class="lede">These are the 32 tasks from the import template. Tick what might get done and watch which Pilgrimages open. The numbers use the plan's Devotion rates: 0.5 per step, plus 1 / 2 / 4 for an S / M / L Decree.</p>
     </div>
     <div class="calc">
       <div class="meter" aria-live="polite">
         <div>
-          <span class="eyebrow">Devotion earned</span>
+          <span class="eyebrow"><svg class="ic" aria-hidden="true"><use href="#i-flame"/></svg>Devotion earned</span>
           <div class="big tnum" id="dev">0<small id="devsub">from 0 Decrees</small></div>
         </div>
         <div class="bar" id="bar"><div class="fill" id="fill"></div></div>
         <ul class="unlocks" id="unlocks"></ul>
         <div class="presets">
-          <button type="button" id="p-week">Everything due this week</button>
-          <button type="button" id="p-small">Three small tasks</button>
-          <button type="button" id="p-all">All 32</button>
-          <button type="button" id="p-none">Clear</button>
+          <button type="button" id="p-week"><svg class="ic" aria-hidden="true"><use href="#i-calendar-days"/></svg>Everything due this week</button>
+          <button type="button" id="p-small"><svg class="ic" aria-hidden="true"><use href="#i-feather"/></svg>Three small tasks</button>
+          <button type="button" id="p-all"><svg class="ic" aria-hidden="true"><use href="#i-list"/></svg>All 32</button>
+          <button type="button" id="p-none"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg>Clear</button>
         </div>
       </div>
       <div class="tasklist" id="tasklist" role="group" aria-label="Tasks from the import template"></div>
     </div>
     <ul class="questions">
-      <li><span class="src">From the task list</span><b>The first week unlocks two Pilgrimages.</b><span>The five tasks due by Nov 25 add up to 15.5 Devotion, past both the 5 and 12 thresholds. The plan aims for the first Pilgrimage within about a week, so the thresholds may need to go up, or step Devotion may need to go down.</span></li>
-      <li><span class="src">From the task list</span><b>All three open with about a fifth of the list done.</b><span>The full list is worth 109 Devotion and the last threshold is 20. Do the later Pilgrimage slots need to be ready sooner, or should the thresholds scale up?</span></li>
-      <li><span class="src">From the task list</span><b>32 lots is a crowded island.</b><span>20 of the 32 tasks recur, and Garden alone has 8. Does each Decree get its own lot, or does each institution have one building that grows with all of its Decrees?</span></li>
-      <li><span class="src">Open question 2</span><b>Do the seven institutions fit?</b><span>Garden and Art carry the most tasks. Health and Other are light. Should any be split, renamed or merged?</span></li>
-      <li><span class="src">Open question 3</span><b>What happens to archived Decrees?</b><span>The proposal: the building stays as a "Relic Ruin" landmark unless removed.</span></li>
-      <li><span class="src">Open question 4</span><b>Can Pilgrimages be replayed?</b><span>One time only, or replayable from a Pilgrim's Journal for fun, with no further rewards?</span></li>
+      <li><span class="src"><svg class="ic" aria-hidden="true"><use href="#i-file-spreadsheet"/></svg>From the task list</span><b>The first week unlocks two Pilgrimages.</b><span>The five tasks due by Nov 25 add up to 15.5 Devotion, past both the 5 and 12 thresholds. The plan aims for the first Pilgrimage within about a week, so the thresholds may need to go up, or step Devotion may need to go down.</span></li>
+      <li><span class="src"><svg class="ic" aria-hidden="true"><use href="#i-file-spreadsheet"/></svg>From the task list</span><b>All three open with about a fifth of the list done.</b><span>The full list is worth 109 Devotion and the last threshold is 20. Do the later Pilgrimage slots need to be ready sooner, or should the thresholds scale up?</span></li>
+      <li><span class="src"><svg class="ic" aria-hidden="true"><use href="#i-file-spreadsheet"/></svg>From the task list</span><b>32 lots is a crowded island.</b><span>20 of the 32 tasks recur, and Garden alone has 8. Does each Decree get its own lot, or does each institution have one building that grows with all of its Decrees?</span></li>
+      <li><span class="src"><svg class="ic" aria-hidden="true"><use href="#i-circle-help"/></svg>Open question 2</span><b>Do the seven institutions fit?</b><span>Garden and Art carry the most tasks. Health and Other are light. Should any be split, renamed or merged?</span></li>
+      <li><span class="src"><svg class="ic" aria-hidden="true"><use href="#i-circle-help"/></svg>Open question 3</span><b>What happens to archived Decrees?</b><span>The proposal: the building stays as a "Relic Ruin" landmark unless removed.</span></li>
+      <li><span class="src"><svg class="ic" aria-hidden="true"><use href="#i-circle-help"/></svg>Open question 4</span><b>Can Pilgrimages be replayed?</b><span>One time only, or replayable from a Pilgrim's Journal for fun, with no further rewards?</span></li>
     </ul>
   </section>
 
@@ -822,6 +1176,8 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
     { id: 'health', name: 'The Nap Chapel', monk: 'Brother Pillow', line: 'The Caretaker shall Rest. It is Commanded.' },
     { id: 'other', name: 'The Miscellany Reliquary', monk: 'Sister Odds', line: 'A Matter of Uncertain Nature requires Attention.' },
   ];
+  const CAT_ICON = { finance: 'coins', art: 'palette', garden: 'sprout', car: 'car', home: 'hammer', health: 'bed', other: 'package' };
+  const catIcon = id => `<svg class="ic" aria-hidden="true"><use href="#i-${CAT_ICON[id]}"/></svg>`;
   const CAT_LABEL = { finance: 'Finance', art: 'Art', garden: 'Garden', car: 'Car', home: 'Home', health: 'Health', other: 'Other' };
   // [title, category, effort, due, recurring, steps] — from templates/decrees.csv
   const TASKS = [
@@ -875,7 +1231,7 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
   grid.innerHTML = INST.map(i => {
     const mine = TASKS.filter(t => t[1] === i.id);
     return `<article class="inst">
-      <header><span class="cat">${CAT_LABEL[i.id]}</span><span class="count tnum">${mine.length} in the template</span></header>
+      <header><span class="cat">${catIcon(i.id)}${CAT_LABEL[i.id]}</span><span class="count tnum">${mine.length} in the template</span></header>
       <h3>${esc(i.name)}</h3>
       <p class="monkname">${esc(i.monk)}</p>
       <p class="line">"${esc(i.line)}"</p>
@@ -923,6 +1279,34 @@ footer { text-align: center; color: var(--muted); font-family: var(--font-displa
   document.getElementById('p-all').addEventListener('click', () => setWhere(() => true));
   document.getElementById('p-none').addEventListener('click', () => setWhere(() => false));
   setWhere(t => t[3] && t[3] <= '2026-11-25');
+
+  // Pug generator for the payout card (example name pools)
+  const PUG = {
+    first: ['Sir Snorbert', 'Dame Pudding', 'Brother Biscuit', 'Lady Wrinkleton', 'Lord Humphrey', 'Abbess Mochi', 'Sir Grumbleweed', 'Dame Doughnut'],
+    epithet: ['the Damp', 'the Unbothered', 'the Thrice-Napped', 'the Squashed', 'the Magnificent', 'the Round', 'the Snorer', 'the Lesser'],
+    office: ['Keeper of the Lesser Cushion', 'Warden of the Sunbeam', 'Taster of Crumbs', 'Guardian of the Squeaky Relic', 'High Snorer of the East Wing', 'Inspector of Laps', 'Bearer of the Holy Sock'],
+  };
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  document.getElementById('pug-roll').addEventListener('click', () => {
+    document.getElementById('pug-name').textContent = pick(PUG.first) + ' ' + pick(PUG.epithet);
+    document.getElementById('pug-office').textContent = pick(PUG.office);
+  });
+
+  // Live mood demo
+  const moodBox = document.querySelector('.mood-demo');
+  const MOOD = {
+    ok: ['sploot', 'Candles are lit. Brother Axle polishes a chariot. The pug sploots.'],
+    soon: ['hm?', 'Moss creeps up the walls and a light fog rolls in. Brother Axle starts pacing.'],
+    over: ['hmph', 'A fog bank settles over the stables. The candles gutter, the monk wrings their hands, the pug sulks. Nothing is lost.'],
+    streak: ['♪', 'Light pours through the stained glass. A streak plaque hangs by the door and the choir hums.'],
+  };
+  moodBox.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+    const m = b.dataset.m;
+    moodBox.dataset.mood = m;
+    moodBox.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    document.getElementById('bubble-t').textContent = MOOD[m][0];
+    document.getElementById('scene-cap').textContent = MOOD[m][1];
+  }));
 
   // Sticky nav: highlight the section in view
   const navMenus = document.getElementById('navmenus');
