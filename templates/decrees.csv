@@ -1,5 +1,33 @@
 title,category,effort,due,repeat_every,repeat_unit,steps,resources,notes
-File taxes,finance,L,,1,year,Gather W-2s and 1099s | Collect receipts | Fill out return | Submit,Tax portal https://www.irs.gov,
-Paint the mural,art,L,,,,Pick a design | Buy paint | Prime the wall | Paint,,
-Put up garden posts for the beans,garden,M,,,,Buy posts | Dig holes | Set posts | Run twine,,
-Oil change,car,S,,3,month,Buy oil and filter | Drain old oil | Replace filter | Refill,,
+File taxes,finance,L,2027-04-15,1,year,Gather W-2s and 1099s | Collect art sales receipts | Tally studio supply expenses | Fill out return | Submit,IRS https://www.irs.gov,Remember the home studio deduction
+Renew homeowners insurance,finance,S,2027-01-10,1,year,Review coverage | Compare two quotes | Renew,,
+Set up a shared budget spreadsheet,finance,M,2026-12-15,,,List monthly bills | Add garden and art budgets | Share with each other,,
+Sell prints at the holiday craft fair,art,L,2026-12-06,,,Pick 10 designs | Order prints | Make price tags | Pack the booth kit,,Bring the folding table and square reader
+Paint the backyard mural,art,L,2027-06-01,,,Sketch the design | Buy exterior paint | Pressure-wash and prime the fence | Paint,,Wait for a dry stretch in late spring
+Finish the watercolor dahlia series,art,M,2027-01-31,,,Paint the last 3 pieces | Scan all 8 | Post the set,,
+Reorganize the shared studio,art,M,,,,Sort paints and brushes | Toss dried-out supplies | Label the bins | Hang a pegboard,,
+Frame the pieces for the spring show,art,M,2027-03-15,,,Choose pieces | Measure | Order frames | Hang wire,,
+Clean the brushes and palettes,art,S,,1,week,Soak | Wash | Dry flat,,
+Lift and store the dahlia tubers,garden,L,2026-11-25,1,year,Cut stalks back after frost | Dig tubers | Rinse and dry | Label by variety | Pack in peat in the garage,,Do this before the first hard freeze
+Plant tulip and daffodil bulbs,garden,M,2026-11-30,1,year,Mark beds | Dig | Plant | Mulch,,
+Mulch the perennial beds,garden,M,2026-12-01,1,year,Order mulch | Weed the beds | Spread 2-3 inches,,
+Prune the roses,garden,M,2027-02-20,1,year,Sharpen pruners | Cut out dead wood | Shape to an open vase | Clean up leaves,,Prune when the forsythia blooms
+Start seeds indoors,garden,M,2027-03-01,1,year,Inventory seeds | Set up the grow lights | Sow cosmos and zinnias | Label trays,,
+Put up garden posts for the sweet peas,garden,M,2027-03-15,,,Buy posts | Dig holes | Set posts | Run twine,,
+Slug patrol,garden,S,,1,week,Check the hostas | Refill the beer traps,,
+Divide the overgrown irises,garden,M,2027-08-15,,,Dig the clumps | Split the rhizomes | Replant | Give extras to the neighbors,,
+Oil change,car,S,2026-12-10,3,month,Book an appointment | Drop off the car | Reset the reminder,,
+Swap to winter tires,car,S,2026-11-22,1,year,Book the tire shop | Check the tread,,Chains in the trunk for pass trips
+Renew car registration,car,S,2027-02-01,1,year,Find the renewal notice | Pay online,,
+Clean the gutters,home,M,2026-11-28,6,month,Get the ladder out | Scoop out the leaves | Flush the downspouts,,
+Treat the moss on the roof,home,M,2027-01-15,1,year,Buy moss treatment | Wait for a dry day | Apply | Sweep the walkway,,
+Winterize the outdoor faucets,home,S,2026-11-20,1,year,Drain the hoses | Store them | Cover the spigots,,
+Replace the furnace filter,home,S,2026-12-01,3,month,Check the size | Buy filters | Swap,,
+Fix the leaky kitchen faucet,home,S,,,,Identify the faucet model | Buy a cartridge | Replace,,
+Test the smoke detectors,home,S,2027-01-01,6,month,Press test on each | Replace the batteries,,
+Book annual checkups,health,S,2027-01-20,1,year,Call the doctor | Call the dentist | Add to calendar,,
+Get flu shots,health,S,2026-11-30,1,year,Find a pharmacy | Go together,,
+Set up the light therapy lamp,health,S,2026-11-25,,,Find the lamp | Set it on the breakfast table | Use 20 min each morning,,PNW winter survival
+Take a weekend getaway to the coast,health,M,2027-02-14,,,Pick dates | Book a cabin | Pack the sketchbooks,,
+Return the borrowed tile saw,other,S,2026-11-24,,,Load it in the car | Drop it off,,
+Donate old clothes,other,S,,6,month,Sort closets | Bag | Drop off,,
