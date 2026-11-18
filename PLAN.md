@@ -264,12 +264,30 @@ Each phase ends in something you can deploy and use.
 ### Phase 1 — Decree core (task manager, no game yet)
 - Vite + React + TS scaffold, lint/format, Vitest.
 - Decree model, store, IndexedDB persistence, JSON export/import.
+- CSV import from a spreadsheet (format below; template at `templates/decrees.csv`).
 - Decree list grouped as Overdue / Due Soon / Later / Recurring, with an institution filter.
 - Decree editor sheet: title, institution (category), effort, due date, recurrence, Articles (steps), Holy Texts (resources), notes.
 - Completing a step or Decree, with recurrence rollover.
 - Light theming: parchment cards, wax-seal checkbox, a generated flavor line per Decree.
 
 **Done when:** your real tasks are entered on a phone, survive a reload, and the copy already makes you smile.
+
+#### CSV import format
+One row per Decree. Fill it in Google Sheets/Excel, then export as CSV. Only `title` is required.
+
+| Column         | Values                                                                         | Maps to                    |
+| -------------- | ------------------------------------------------------------------------------ | -------------------------- |
+| `title`        | Free text, kept exactly as written                                             | `title`                    |
+| `category`     | `finance`, `art`, `garden`, `car`, `home`, `health`, `other` (blank → `other`) | `categoryId`               |
+| `effort`       | `S`, `M`, `L` (blank → `M`)                                                    | `effort`                   |
+| `due`          | `YYYY-MM-DD`, or blank                                                         | `due`                      |
+| `repeat_every` | Whole number, or blank for one-off                                             | `recurrence.every`         |
+| `repeat_unit`  | `day`, `week`, `month`, `year` (required if `repeat_every` is set)             | `recurrence.unit`          |
+| `steps`        | Items separated by ` \| `, in order                                            | `steps[]` (all not done)   |
+| `resources`    | Items separated by ` \| `; each is a label, optionally ending in a URL         | `resources[].label`, `url` |
+| `notes`        | Free text                                                                      | `notes`                    |
+
+Import creates new Decrees (status `active`, fresh ids) and reports any rows it skipped and why.
 
 ### Phase 2 — The island shell
 - SVG surface map: cottage, courtyard, sleeping quarters, cliff path, bridge with a placeholder Lord Chonk, and fog.
